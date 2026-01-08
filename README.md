@@ -19,6 +19,8 @@ The data contained multiple quality issues such as:
   
 All cleaning activities were carried out on **14/12/2025** with the objective of producing a reliable, analysis-ready dataset.
 
+<img width="760" height="297" alt="Raw data" src="https://github.com/user-attachments/assets/5f1a8e91-3bd3-4e8e-b1a2-7d81c56a8705" />
+
 ## 1.3	Methodology
 Data cleaning and preparation for the Trendify Retail Co dataset were performed using SQL (MySQL). The objective was to transform the raw transactional data into a consistent, accurate, and analysis-ready dataset suitable for exploratory analysis and business reporting.
 The cleaning process followed a structured and rule-based approach:
@@ -28,7 +30,7 @@ The cleaning process followed a structured and rule-based approach:
 - **Data type enforcement:** Key columns were converted to appropriate data types and constraints were applied to improve reliability.
 - **Text normalization:** Customer names, product names, and categorical fields were cleaned to remove inconsistencies, extra spaces, and placeholder values.
 - **Numerical corrections:** Negative values in quantity and unit price fields were corrected to maintain logical consistency.
-- 
+  
 Each cleaning step was validated using diagnostic SQL queries, including distinct counts, null checks, and data type verification. The final dataset reflects a balance between data quality and data retention, ensuring trustworthy insights while minimizing unnecessary data loss.
 ## 1.4	Data Cleaning Steps
 ### 1.4.1	Identifying and Removing Duplicate Orders
@@ -51,6 +53,8 @@ Validation was performed using:
 SELECT DISTINCT OrderID
 FROM retail_data_clean;
 ```
+<img width="624" height="237" alt="Distinct Orders" src="https://github.com/user-attachments/assets/8da27a5d-92a6-4d94-bd76-b7510052e5ce" />
+
 ### 1.4.2	Handling OrderID Inconsistencies
 Several invalid OrderID values were identified, including blanks and placeholders such as ???, 99999, and ORDX.
 
@@ -74,6 +78,8 @@ ALTER TABLE retail_data_clean
 MODIFY OrderID BIGINT NOT NULL,
 ADD UNIQUE (OrderID);
 ```
+<img width="178" height="187" alt="Inconsistent OrderID" src="https://github.com/user-attachments/assets/d09fc09a-46d9-4e36-b19e-34de2199438a" />
+
 ### 1.4.3	Cleaning and Standardizing Order Dates
 Blank and missing OrderDate values were identified:
 ```sql
@@ -84,6 +90,8 @@ WHERE
     OR TRIM(OrderDate) = '';
 ```
 A total of 213 records had missing dates and were deleted.
+
+<img width="271" height="343" alt="Missing Order Dates" src="https://github.com/user-attachments/assets/6b1d3cae-9ac5-4e37-a184-5b0acb6271e9" />
 
 Date formats varied significantly (DD/MM/YYYY, MM/DD/YYYY, DD MON YY, etc.). These were standardized to ISO format (YYYY MM DD):
 ```sql
@@ -143,12 +151,16 @@ Distinct country values were reviewed:
 SELECT DISTINCT Country
 FROM retail_data_clean;
 ```
+<img width="232" height="316" alt="Counties Inconsistencies" src="https://github.com/user-attachments/assets/e220d6f1-3847-411c-a015-e4bcf4c320e2" />
+
 Country abbreviations were standardized:
 ```sql
 UPDATE retail_data_clean
 SET Country = 'Rwanda'
 WHERE Country IN ('RW','Rw');
 ```
+<img width="195" height="214" alt="Clean Countries" src="https://github.com/user-attachments/assets/c49671b2-b097-46e5-baab-becf56edb98c" />
+
 ### 1.4.6	Column Pruning
 The email column was removed as it was irrelevant for analysis:
 ```sql
@@ -162,6 +174,8 @@ SELECT DISTINCT ProductID, ProductName
 FROM retail_data_clean
 ORDER BY ProductID;
 ```
+<img width="222" height="258" alt="ProductID and Product Name" src="https://github.com/user-attachments/assets/66a1e5d9-5575-4e52-bbe9-b960852d3a49" />
+
 Invalid and placeholder product names were removed:
 ```sql
 DELETE FROM retail_data_clean
@@ -174,11 +188,15 @@ UPDATE retail_data_clean
 SET UnitPrice = ABS(UnitPrice)
 WHERE UnitPrice < 0;
 ```
+<img width="441" height="337" alt="Category Distribution before cleaning" src="https://github.com/user-attachments/assets/34e8aed5-2d4e-4be9-8e4f-b235ae31c1a8" />
+
 ```sql
 UPDATE retail_data_clean
 SET Quantity = ABS(Quantity)
 WHERE Quantity < 0;
 ```
+<img width="497" height="285" alt="Clean Category Value" src="https://github.com/user-attachments/assets/2ef909fb-2761-464b-bf33-b70096a5f2a7" />
+
 ### 1.4.9	Null Quantity and Unit Prices
 A total of 80 records were identified with zero or null quantity values.
 These values were imputed using the global average of valid quantities, calculated via a scalar subquery, ensuring minimal distortion to overall sales volume while preserving record completeness.
@@ -192,6 +210,7 @@ SET Quantity = (
 WHERE Quantity = 0
    OR Quantity IS NULL;
 ```
+
 Additionally, 80 records were found with unit prices recorded as 0.0.
 Since valid prices for these products existed elsewhere in the dataset, unit prices were corrected using a correlated subquery that matched records by product name and product category. This ensured product-level price consistency while avoiding cross-category contamination.
 ```sql
@@ -218,6 +237,8 @@ After completing all cleaning steps:
 - Initial records: 6,196 rows and 15 columns
 - Final clean records: 4,298 rows and 13 columns
   
+  <img width="624" height="299" alt="Clean TrendyCo data" src="https://github.com/user-attachments/assets/eecdfd29-1384-44de-937e-a5ee8589a2cd" />
+
 This dataset is now consistent, standardized, and ready for reliable exploratory analysis and business reporting.
 ## 1.5	Data Analysis
 The objective of the analysis phase is to identify sales trends, revenue drivers, product and category performance, channel effectiveness, and discount impact to support business decision-making.
@@ -244,11 +265,16 @@ COUNT(distinct CustomerName) AS ToatalCustomers,
  SUM(UnitPrice*Quantity) AS Revenue
 FROM retail_data_clean
 ```
+
+<img width="701" height="62" alt="Overall Business Snapshot" src="https://github.com/user-attachments/assets/5dda76e9-f18a-482a-9935-11e092396e39" />
+
 This query was executed to generate a high-level overview of the business after data cleaning.
 The resulting metrics provide baseline indicators of operational scale, customer reach, product diversity, sales channels, and revenue performance. These measures serve as reference points for all subsequent analyses and ensure consistency across detailed product, channel, time-based, and geographic evaluations.
  
 ### 1.5.2	Objective Driven Exploratory Analysis 
 Following the establishment of baseline business metrics, the analysis proceeded in alignment with the core business questions. Each analytical section was designed to directly address a specific performance concern related to products, channels, pricing strategies, time-based trends, and geographic performance.
+
+
 #### 1.5.2.1	Product and Category Analysis
 **Business problem:** Which products and categories drive revenue, and which are underperforming?
 To find the Categories performance, this query was run.
@@ -260,6 +286,8 @@ FROM retail_data_clean
 GROUP BY Category
 ORDER BY Revenue
 ```
+<img width="434" height="193" alt="Performance by Category" src="https://github.com/user-attachments/assets/81f3eb23-08ab-4a63-9e58-d4dfd7c0cf3a" />
+
 The analysis shows that Apparel is the top-performing category, contributing 35% of total revenue, followed by Footwear (31%), Accessories (20%), and Clothes (14%). 
 Revenue is therefore concentrated in Apparel and Footwear, which together account for 66% of total sales value.
 This indicates that the business is heavily reliant on these two categories for revenue generation, while the Clothes category may require further review to understand its lower contribution.
@@ -272,7 +300,9 @@ FROM retail_data_clean
 GROUP BY Category,ProductID,ProductName
 ORDER BY ProductRevenue desc
 LIMIT 10;
-``` 
+```
+<img width="525" height="260" alt="Performing Products" src="https://github.com/user-attachments/assets/9df90771-70e8-4f93-9370-0eda85daaad7" />
+
 To identify the key revenue drivers at the product level, total revenue was aggregated per product and category. This analysis highlights the products that contribute the most to overall sales value.
 The results show that revenue is driven by a relatively small number of products across multiple categories. 
 Denim Jacket is the highest-revenue product, followed by Bracelet and Jeans. Apparel and Footwear feature prominently among the top products, reinforcing their importance as core revenue-generating categories.
@@ -283,6 +313,8 @@ GROUP BY Category,ProductID,ProductName
 ORDER BY ProductRevenue asc
 LIMIT 10;
 ```
+<img width="456" height="273" alt="Bottom 10 Performing Products" src="https://github.com/user-attachments/assets/9c647ccc-7fa5-4dc8-a9fa-413a40f09ac1" />
+
 To identify underperforming products, total revenue was aggregated at the product level and ranked in ascending order. 
 The analysis shows that the lowest-performing products generate substantially less revenue compared to top performers. 
 Products such as Necklace, Boots, and Beanie contribute minimal revenue, indicating limited demand, low pricing, or reduced sales frequency. 
@@ -299,6 +331,8 @@ FROM retail_data_clean
 GROUP BY OrderSource
 ORDER BY Revenue DESC;
 ```
+<img width="313" height="176" alt="Channel Performance" src="https://github.com/user-attachments/assets/e07e214a-b7b2-4b5d-b9c7-10e0eacf6cf9" />
+
 The analysis of sales performance by order source reveals a balanced distribution between online and physical channels, with web and in-store purchases leading overall performance.
 - Store is the top-performing channel by order volume with 1,214 orders, generating 112,132.11 in revenue.
 - Web closely follows, contributing 1,191 orders and 112,574.89 in revenue — the highest revenue-generating channel.
@@ -321,6 +355,8 @@ SUM(UnitPrice*Quantity) AS Revenue
 FROM retail_data_clean
 GROUP BY DiscountFlag 
 ```
+<img width="419" height="95" alt="Discount Impact on Revenue" src="https://github.com/user-attachments/assets/f8efdd42-2994-4154-a742-b46405c31ac1" />
+
 The analysis shows that discounted and non-discounted orders contribute almost equally to total revenue.
 While slightly more orders were placed with discounts applied (2,193 vs 2,105), the total revenue generated by non-discounted sales is marginally higher.
 This indicates that discounts are effective at increasing order volume, but do not significantly increase overall revenue. The near-equal revenue contribution suggests that discounted sales may be offset by lower unit prices, limiting their impact on revenue growth.
@@ -336,6 +372,8 @@ WHERE DiscountCode IS NOT NULL
 GROUP BY DiscountCode
 ORDER BY Revenue DESC;
 ```
+<img width="308" height="126" alt="Discount Codes Performance" src="https://github.com/user-attachments/assets/03174b5d-1bd2-4f21-a2a7-8191cf1e792b" />
+
 The analysis shows SUMMER discount code generated the highest revenue, its margin contribution is only slightly higher than the other discount campaigns, with margins of approximately 71k for SUMMER, 68k for NEW10, and 62k for DISC-20. 
 This indicates that while SUMMER performs marginally better, the difference in profitability across discount codes is not substantial. 
 Overall, discounted sales deliver comparable margin outcomes, suggesting that discounts influence purchasing behavior without significantly differentiating profit performance. 
@@ -352,6 +390,9 @@ FROM retail_data_clean
 GROUP BY YEAR(OrderDate)
 ORDER BY Year;
 ```
+
+<img width="269" height="125" alt="Over time Performance" src="https://github.com/user-attachments/assets/9c767224-311a-47b0-aeca-9ed7efa0da59" />
+
 The yearly sales analysis indicates that 2024 is the dominant performance year, contributing 51.1% of total revenue and 52% of total orders, making it the primary driver of overall business activity. This is followed by 2025, which accounts for 44.6% of total revenue and 43.6% of total orders, reflecting sustained but slightly lower performance compared to 2024.
 In contrast, 2023 and 2026 contribute marginally to overall performance, with 2023 generating 2.7% of revenue and 2.55% of orders, while 2026 accounts for 1.6% of revenue and 1.7% of orders. The limited contribution of these years suggests partial-year coverage or lower transaction volume, indicating that performance insights are primarily driven by activity in 2024 and 2025.
 As a result, subsequent trends and seasonal analyses are most meaningful when focused on 2024 and 2025, where sufficient transaction volume exists to support reliable conclusions.
@@ -369,9 +410,13 @@ GROUP BY YEAR(OrderDate), MONTH(OrderDate), MONTHNAME(OrderDate)
 ORDER BY Year, MONTH(OrderDate);
 
 ```
+
+<img width="399" height="520" alt="Performance Trend over time" src="https://github.com/user-attachments/assets/020f3cfb-dee9-4293-83fa-c070541cc604" />
+
 The monthly sales trend analysis for 2024 and 2025 shows relatively stable performance across most months, with moderate fluctuations in both order volume and revenue. In 2024, revenue remains consistently distributed throughout the year, with small peaks observed in March, August, and October, indicating steady consumer demand rather than strong seasonality.
 In 2025, performance follows a similar pattern during the first eight months, with revenue peaking notably in August, suggesting a strong mid-year sales period. However, a sharp decline is observed from September through December 2025, where both order counts and revenue drop significantly. This decline is likely driven by incomplete or partial data capture for the latter months of 2025 rather than an actual collapse in business performance.
 Overall, the trend indicates that the business experiences its strongest and most consistent sales activity during the first three quarters of the year, while year-end results should be interpreted cautiously due to potential data availability limitations.
+
 ##### 1.5.2.5.2	Month-over-Month (MoM) Revenue Growth Analysis
 **Business Problem:** How does revenue change from month to month, and what does this indicate about performance stability?
 Month-over-month (MoM) revenue growth was analyzed to assess short-term performance momentum across the available period (2023–2026). Monthly revenue was compared to the previous month to identify growth patterns and volatility.
@@ -402,6 +447,8 @@ SELECT
 FROM monthly_revenue
 ORDER BY Year, Month;
 ```
+<img width="316" height="177" alt="Regional Trends" src="https://github.com/user-attachments/assets/f2e41784-498e-4255-9280-e8dae3e8dbc7" />
+
 #### 1.5.2.6	Geographic / Regional Performance Analysis
 Business Problem: How does sales performance vary by geography, and which regions drive or lag revenue?
 ```sql
@@ -468,7 +515,8 @@ Kenya is the strongest market and should remain the primary focus for revenue gr
 - This analysis positions Trendify Retail Co to make informed strategic decisions supported by clean, reliable data and objective-driven insights.
 
 
- 
+ <img width="624" height="343" alt="Dashboard" src="https://github.com/user-attachments/assets/a4cc9c99-d2d7-4522-8df5-f9053228454c" />
+
 
 
 
