@@ -504,7 +504,7 @@ The absence of strong seasonality suggests predictable demand throughout most of
 Kenya is the strongest market and should remain the primary focus for revenue growth initiatives. Secondary markets such as Tanzania, Uganda, and Rwanda present opportunities for targeted expansion through localized promotions or partnerships. Lower-performing regions should be evaluated for growth potential before further investment.
 ## 1.8	Dashboard
  
-
+<img width="624" height="343" alt="Dashboard" src="https://github.com/user-attachments/assets/a4cc9c99-d2d7-4522-8df5-f9053228454c" />
 
 ## 1.9	Conclusion
 - The objective of this project was to transform raw transactional data from Trendify Retail Co into a reliable, analysis-ready dataset and to extract actionable business insights to support data-driven decision-making.
@@ -514,8 +514,6 @@ Kenya is the strongest market and should remain the primary focus for revenue gr
 - Overall, the findings provide clear guidance for optimizing product strategy, refining discount policies, strengthening channel attribution, improving forecasting accuracy, and focusing growth efforts on high-impact categories and regions.
 - This analysis positions Trendify Retail Co to make informed strategic decisions supported by clean, reliable data and objective-driven insights.
 
-
- <img width="624" height="343" alt="Dashboard" src="https://github.com/user-attachments/assets/a4cc9c99-d2d7-4522-8df5-f9053228454c" />
 
 
 
